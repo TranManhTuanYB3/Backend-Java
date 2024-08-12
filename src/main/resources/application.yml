@@ -1,7 +1,7 @@
 spring:
   datasource:
-    username: root # Thay bằng tên tài khoản đăng nhập vào CSDL trong MySQL trên máy cá nhân
-    password: 17032000 # Mật khẩu của tài khoản trên
+    username: tuan # Thay bằng tên tài khoản đăng nhập vào CSDL trong MySQL trên máy cá nhân
+    password: tuan2003 # Mật khẩu của tài khoản trên
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/crud_vks?createDatabaseIfNotExist=true
   jackson:
@@ -17,7 +17,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database: oracle
+    database: mysql
 
 application:
   security:
