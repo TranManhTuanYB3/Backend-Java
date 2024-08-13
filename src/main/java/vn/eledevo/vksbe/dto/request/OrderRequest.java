@@ -2,6 +2,8 @@ package vn.eledevo.vksbe.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.entity.Customer;
+import vn.eledevo.vksbe.entity.Employee;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,11 +16,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class OrderRequest {
-    String employeeID;
-    String employeeName;
-    String customerName;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    Employee employee;
+    Customer customer;
     BigDecimal price;
     String status;
 }

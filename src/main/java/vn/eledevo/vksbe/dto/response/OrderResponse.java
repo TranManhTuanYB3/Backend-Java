@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class OrderResponse {
     Long id;
+    String employeeID;
     String employeeName;
     String customerName;
     LocalDateTime createdAt;

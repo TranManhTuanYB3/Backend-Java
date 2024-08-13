@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.dto.request.CustomerRequest;
 import vn.eledevo.vksbe.dto.response.CustomerResponse;
 import vn.eledevo.vksbe.entity.Customer;
+import vn.eledevo.vksbe.entity.Order;
 import vn.eledevo.vksbe.mapper.CustomerMapper;
 import vn.eledevo.vksbe.repository.CustomerRepository;
+import vn.eledevo.vksbe.repository.OrderRepository;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService{
+
+    OrderRepository orderRepository;
 
     CustomerRepository customerRepository;
 
@@ -69,6 +73,11 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public Customer deleteCustomer(Long id) {
+        List<Order> orders = orderRepository.findByCustomerId(id);
+        for (Order order : orders) {
+            order.setCustomer(null);
+            orderRepository.save(order);
+        }
         customerRepository.deleteById(id);
         return null;
     }

@@ -26,6 +26,6 @@ public interface OrderRepository extends BaseRepository<Order, Long>{
                              @Param("price") BigDecimal price,
                              @Param("status") String status,
                              Pageable pageable);
-
     List<Order> findByEmployeeId(Long id);
+    List<Order> findByCustomerId(Long id);
 }

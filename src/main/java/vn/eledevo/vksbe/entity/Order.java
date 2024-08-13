@@ -25,10 +25,12 @@ public class Order {
     Employee employee;
     String employeeID;
     String employeeName;
+
     @ManyToOne
     @JoinColumn(name = "customer")
     Customer customer;
     String customerName;
+
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     BigDecimal price;
