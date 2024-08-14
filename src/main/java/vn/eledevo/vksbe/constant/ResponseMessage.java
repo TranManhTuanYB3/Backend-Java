@@ -15,4 +15,16 @@ public class ResponseMessage {
     public static final String DEVICE_INFO_BLANK = "Tên thiết bị không được để trống";
 
     public static final String DEVICE_INFO_UUID_BLANK = "Mã UUID thiết bị không được để trống";
+
+    public static final String CUSTOMER_EXIST = "Khách hàng đã tồn tại";
+
+    public static final String CUSTOMER_NOT_EXIST = "Khách hàng không tồn tại";
+
+    public static final String EMPLOYEE_EXIST = "Nhân viên đã tồn tại";
+
+    public static final String EMPLOYEE_NOT_EXIST = "Nhân viên không tồn tại";
+
+    public static final String ORDER_BLANK = "Khách hàng và nhân viên không được để trống";
+
+    public static final String ORDER_NOT_EXIST = "Đơn hàng không tồn tại";
 }

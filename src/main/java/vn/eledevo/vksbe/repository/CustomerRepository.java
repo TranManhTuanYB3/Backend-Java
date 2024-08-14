@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.eledevo.vksbe.entity.Customer;
+import vn.eledevo.vksbe.entity.Employee;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public interface CustomerRepository extends BaseRepository<Customer, Long> {
                                    @Param("phone") String phone,
                                    @Param("status") String status,
                                    Pageable pageable);
-
     List<Customer> findByEmployeeId(Long id);
+    boolean existsByEmployeeId(Long employee);
+    boolean existsById(Long id);
 }

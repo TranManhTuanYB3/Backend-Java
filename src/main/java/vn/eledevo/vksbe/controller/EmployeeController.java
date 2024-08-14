@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.EmployeeRequest;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.EmployeeResponse;
 import vn.eledevo.vksbe.entity.Employee;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.employee.EmployeeService;
 
 import java.util.List;
@@ -17,12 +19,12 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping("/get")
-    public ResponseEntity<List<EmployeeResponse>> getAllEmployee(){
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getAllEmployee(){
         return ResponseEntity.ok(employeeService.getAllEmployee());
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<EmployeeResponse>> getEmployee(
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getEmployee(
             @RequestBody Employee textSearch,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "") String sortDirection,
@@ -33,17 +35,17 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Employee> addEmployee(@RequestBody EmployeeRequest employeeRequest){
+    public ResponseEntity<ApiResponse<Employee>> addEmployee(@RequestBody EmployeeRequest employeeRequest){
         return ResponseEntity.ok(employeeService.addEmployee(employeeRequest));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest){
+    public ResponseEntity<ApiResponse<Employee>> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) throws ValidationException {
         return ResponseEntity.ok(employeeService.updateEmployee(id, employeeRequest));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Employee> deleteCustomer(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Employee>> deleteCustomer(@PathVariable Long id) throws ValidationException {
         return ResponseEntity.ok(employeeService.deleteEmployee(id));
     }
 }

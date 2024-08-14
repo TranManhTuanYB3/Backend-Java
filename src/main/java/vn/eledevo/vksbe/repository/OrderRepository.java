@@ -28,4 +28,6 @@ public interface OrderRepository extends BaseRepository<Order, Long>{
                              Pageable pageable);
     List<Order> findByEmployeeId(Long id);
     List<Order> findByCustomerId(Long id);
+
+    boolean existsById(Long id);
 }

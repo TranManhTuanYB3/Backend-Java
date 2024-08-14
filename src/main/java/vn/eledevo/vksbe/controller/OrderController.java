@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.OrderRequest;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.OrderResponse;
 import vn.eledevo.vksbe.entity.Order;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.service.order.OrderService;
 
 import java.util.List;
@@ -17,12 +19,12 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping("/get")
-    public ResponseEntity<List<OrderResponse>> getAllOrder(){
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllOrder(){
         return ResponseEntity.ok(orderService.getAllOrder());
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<OrderResponse>> getOrder(
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrder(
             @RequestBody Order textSearch,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "") String sortDirection,
@@ -33,17 +35,17 @@ public class OrderController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Order> addOrder(@RequestBody OrderRequest orderRequest){
+    public ResponseEntity<ApiResponse<Order>> addOrder(@RequestBody OrderRequest orderRequest) throws ValidationException {
         return ResponseEntity.ok(orderService.addOrder(orderRequest));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody OrderRequest orderRequest){
+    public ResponseEntity<ApiResponse<Order>> updateOrder(@PathVariable Long id, @RequestBody OrderRequest orderRequest) throws ValidationException {
         return ResponseEntity.ok(orderService.updateOrder(id, orderRequest));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Order> deleteOrder(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Order>> deleteOrder(@PathVariable Long id) throws ValidationException {
         return ResponseEntity.ok(orderService.deleteOrder(id));
     }
 }

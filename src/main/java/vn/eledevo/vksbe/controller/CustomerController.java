@@ -19,12 +19,12 @@ import java.util.List;
 public class CustomerController {
     private final CustomerService customerService;
     @GetMapping("/get")
-    public ResponseEntity<List<CustomerResponse>> getAllCustomer(){
+    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getAllCustomer(){
         return ResponseEntity.ok(customerService.getAllCustomer());
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<CustomerResponse>> getCustomer(
+    public ResponseEntity<ApiResponse<List<CustomerResponse>>> getCustomer(
             @RequestBody Customer textSearch,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "") String sortDirection,
@@ -35,17 +35,17 @@ public class CustomerController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Customer> addCustomer(@RequestBody CustomerRequest customerRequest){
+    public ResponseEntity<ApiResponse<Customer>> addCustomer(@RequestBody CustomerRequest customerRequest) throws ValidationException {
         return ResponseEntity.ok(customerService.addCustomer(customerRequest));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest customerRequest){
+    public ResponseEntity<ApiResponse<Customer>> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest customerRequest) throws ValidationException {
         return ResponseEntity.ok(customerService.updateCustomer(id, customerRequest));
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<Customer>> deleteCustomer(@PathVariable Long id) throws ValidationException {
         return ResponseEntity.ok(customerService.deleteCustomer(id));
     }
 }

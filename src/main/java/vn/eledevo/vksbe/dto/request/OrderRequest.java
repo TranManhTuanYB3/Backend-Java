@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class OrderRequest {
-    Employee employee;
-    Customer customer;
+    Long employee;
+    Long customer;
     BigDecimal price;
     String status;
 }

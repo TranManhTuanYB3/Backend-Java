@@ -19,5 +19,5 @@ public interface EmployeeRepository extends BaseRepository<Employee, Long>{
                                            @Param("address") String address,
                                            @Param("phone") String phone,
                                            Pageable pageable);
-
+    boolean existsById(Long id);
 }

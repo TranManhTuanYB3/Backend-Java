@@ -8,16 +8,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.dto.request.EmployeeRequest;
+import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.EmployeeResponse;
 import vn.eledevo.vksbe.entity.Customer;
 import vn.eledevo.vksbe.entity.Employee;
 import vn.eledevo.vksbe.entity.Order;
+import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.EmployeeMapper;
 import vn.eledevo.vksbe.repository.CustomerRepository;
 import vn.eledevo.vksbe.repository.EmployeeRepository;
 import vn.eledevo.vksbe.repository.OrderRepository;
 
 import java.util.List;
+
+import static vn.eledevo.vksbe.constant.ResponseMessage.CUSTOMER_NOT_EXIST;
+import static vn.eledevo.vksbe.constant.ResponseMessage.EMPLOYEE_NOT_EXIST;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -31,14 +36,14 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     EmployeeMapper employeeMapper;
     @Override
-    public List<EmployeeResponse> getAllEmployee() {
+    public ApiResponse<List<EmployeeResponse>> getAllEmployee() {
         List<Employee> employeeList = employeeRepository.findAll();
         List<EmployeeResponse> employeeResponseList = employeeMapper.toListResponse(employeeList);
-        return employeeResponseList;
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", employeeResponseList);
     }
 
     @Override
-    public List<EmployeeResponse> getEmployee(Employee textSearch, String sortField, String sortDirection, int currentPage, int limitPage) {
+    public ApiResponse<List<EmployeeResponse>> getEmployee(Employee textSearch, String sortField, String sortDirection, int currentPage, int limitPage) {
         Sort.Direction direction = Sort.Direction.ASC;
         if (sortDirection.equalsIgnoreCase("desc")) {
             direction = Sort.Direction.DESC;
@@ -53,11 +58,11 @@ public class EmployeeServiceImpl implements EmployeeService{
                 pageable
         );
         List<EmployeeResponse> employeeResponseList = employeeMapper.toListResponse(employeeList);
-        return employeeResponseList;
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", employeeResponseList);
     }
 
     @Override
-    public Employee addEmployee(EmployeeRequest employeeRequest) {
+    public ApiResponse<Employee> addEmployee(EmployeeRequest employeeRequest) {
         Employee employee = employeeMapper.toEntity(employeeRequest);
         employeeRepository.save(employee);
         if (employee.getId() < 10) {
@@ -65,20 +70,31 @@ public class EmployeeServiceImpl implements EmployeeService{
         } else {
             employee.setEmployeeID("NV" + employee.getId());
         }
-        return employeeRepository.save(employee);
+        return new ApiResponse<>(200, "Thêm dữ liệu thành công", employeeRepository.save(employee));
     }
 
     @Override
-    public Employee updateEmployee(Long id, EmployeeRequest employeeRequest) {
+    public ApiResponse<Employee> updateEmployee(Long id, EmployeeRequest employeeRequest) throws ValidationException {
+        if (!employeeRepository.existsById(id)){
+            throw new ValidationException("Employee", EMPLOYEE_NOT_EXIST);
+        }
         Employee employee = employeeRepository.findById(id).get();
         employee.setName(employeeRequest.getName());
         employee.setAddress(employeeRequest.getAddress());
         employee.setPhone(employeeRequest.getPhone());
-        return employeeRepository.save(employee);
+        List<Order> orders = orderRepository.findByEmployeeId(id);
+        for (Order order : orders) {
+            order.setEmployeeName(employeeRequest.getName());
+            orderRepository.save(order);
+        }
+        return new ApiResponse<>(200, "Cập nhật dữ liệu thành công", employeeRepository.save(employee));
     }
 
     @Override
-    public Employee deleteEmployee(Long id) {
+    public ApiResponse<Employee> deleteEmployee(Long id) throws ValidationException {
+        if (!employeeRepository.existsById(id)){
+            throw new ValidationException("Employee", EMPLOYEE_NOT_EXIST);
+        }
         List<Customer> customers = customerRepository.findByEmployeeId(id);
         for (Customer customer : customers) {
             customer.setEmployee(null);
@@ -90,6 +106,6 @@ public class EmployeeServiceImpl implements EmployeeService{
             orderRepository.save(order);
         }
         employeeRepository.deleteById(id);
-        return null;
+        return new ApiResponse<>(200, "Xóa dữ liệu thành công");
     }
 }
