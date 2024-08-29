@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.OrderRequest;
+import vn.eledevo.vksbe.dto.request.OrderTextSearchRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.OrderResponse;
 import vn.eledevo.vksbe.entity.Order;
@@ -13,6 +14,7 @@ import vn.eledevo.vksbe.service.order.OrderService;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/order")
 @RequiredArgsConstructor
 public class OrderController {
@@ -25,9 +27,9 @@ public class OrderController {
 
     @PostMapping("/search")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrder(
-            @RequestBody Order textSearch,
+            @RequestBody OrderTextSearchRequest textSearch,
             @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam(defaultValue = "") String sortDirection,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "0") int currentPage,
             @RequestParam(defaultValue = "3") int limitPage
     ){

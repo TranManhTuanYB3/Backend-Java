@@ -27,4 +27,6 @@ public class ResponseMessage {
     public static final String ORDER_BLANK = "Khách hàng và nhân viên không được để trống";
 
     public static final String ORDER_NOT_EXIST = "Đơn hàng không tồn tại";
+
+    public static final String PHONE_EXIST = "Số điện thoại đã tồn tại";
 }

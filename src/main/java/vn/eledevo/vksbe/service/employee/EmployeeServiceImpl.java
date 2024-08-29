@@ -21,8 +21,7 @@ import vn.eledevo.vksbe.repository.OrderRepository;
 
 import java.util.List;
 
-import static vn.eledevo.vksbe.constant.ResponseMessage.CUSTOMER_NOT_EXIST;
-import static vn.eledevo.vksbe.constant.ResponseMessage.EMPLOYEE_NOT_EXIST;
+import static vn.eledevo.vksbe.constant.ResponseMessage.*;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -58,11 +57,21 @@ public class EmployeeServiceImpl implements EmployeeService{
                 pageable
         );
         List<EmployeeResponse> employeeResponseList = employeeMapper.toListResponse(employeeList);
-        return new ApiResponse<>(200, "Lấy dữ liệu thành công", employeeResponseList);
+        long totalRecords = employeeRepository.totalRecords(
+                textSearch.getEmployeeID(),
+                textSearch.getName(),
+                textSearch.getAddress(),
+                textSearch.getPhone()
+        );
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", employeeResponseList, totalRecords);
     }
 
     @Override
-    public ApiResponse<Employee> addEmployee(EmployeeRequest employeeRequest) {
+    public ApiResponse<Employee> addEmployee(EmployeeRequest employeeRequest) throws ValidationException {
+        if (employeeRepository.existsByPhone(employeeRequest.getPhone())) {
+            throw new ValidationException("Phone", PHONE_EXIST);
+        }
+
         Employee employee = employeeMapper.toEntity(employeeRequest);
         employeeRepository.save(employee);
         if (employee.getId() < 10) {
@@ -75,6 +84,10 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Override
     public ApiResponse<Employee> updateEmployee(Long id, EmployeeRequest employeeRequest) throws ValidationException {
+        if (employeeRepository.existsByPhoneAndIdNot(employeeRequest.getPhone(), id)) {
+            throw new ValidationException("Phone", PHONE_EXIST);
+        }
+
         if (!employeeRepository.existsById(id)){
             throw new ValidationException("Employee", EMPLOYEE_NOT_EXIST);
         }
@@ -107,5 +120,19 @@ public class EmployeeServiceImpl implements EmployeeService{
         }
         employeeRepository.deleteById(id);
         return new ApiResponse<>(200, "Xóa dữ liệu thành công");
+    }
+
+    @Override
+    public ApiResponse<List<EmployeeResponse>> getUnassignedEmployees() {
+        List<Employee> employeeList = employeeRepository.findUnassignedEmployees();
+        List<EmployeeResponse> employeeResponseList = employeeMapper.toListResponse(employeeList);
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", employeeResponseList);
+    }
+
+    @Override
+    public ApiResponse<List<EmployeeResponse>> getUnassignedEmployeesExcluding(Long id) {
+        List<Employee> employeeList = employeeRepository.findUnassignedEmployeesExcluding(id);
+        List<EmployeeResponse> employeeResponseList = employeeMapper.toListResponse(employeeList);
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", employeeResponseList);
     }
 }

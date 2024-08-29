@@ -1,10 +1,12 @@
 package vn.eledevo.vksbe.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -30,15 +32,16 @@ public class Order {
     @JoinColumn(name = "customer")
     Customer customer;
     String customerName;
-
-    LocalDateTime createdAt;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    LocalDate createdAt;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     LocalDateTime updatedAt;
     BigDecimal price;
     String status;
 
     @PrePersist
     void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDate.now();
         this.updatedAt = LocalDateTime.now();
     }
 

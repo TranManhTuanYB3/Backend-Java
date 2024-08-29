@@ -1,7 +1,6 @@
 package vn.eledevo.vksbe.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.eledevo.vksbe.dto.request.CustomerRequest;
@@ -14,6 +13,7 @@ import vn.eledevo.vksbe.service.customer.CustomerService;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/customer")
 @RequiredArgsConstructor
 public class CustomerController {
@@ -27,7 +27,7 @@ public class CustomerController {
     public ResponseEntity<ApiResponse<List<CustomerResponse>>> getCustomer(
             @RequestBody Customer textSearch,
             @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam(defaultValue = "") String sortDirection,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "0") int currentPage,
             @RequestParam(defaultValue = "3") int limitPage
             ){

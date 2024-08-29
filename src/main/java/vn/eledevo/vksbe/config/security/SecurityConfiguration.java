@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfiguration {
 
     private static final String[] WHITE_LIST_URL = {
+            "/api/v1/employee/**",
         "/api/v1/customer/**",
         "/api/v1/order/**",
         "/api/v1/auth/**",
@@ -49,7 +50,6 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req -> req.requestMatchers(WHITE_LIST_URL)
                         .permitAll()
                         .requestMatchers("/api/v1/private/**", "/api/v1/public/**",
-                                "/api/v1/employee/**", "/api/v1/customer/delete/**",
                                 "/api/v1/order/delete/**")
                         .hasAnyRole(ADMIN.name())
                         .anyRequest()

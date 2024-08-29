@@ -6,26 +6,46 @@ import org.springframework.data.repository.query.Param;
 import vn.eledevo.vksbe.entity.Order;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderRepository extends BaseRepository<Order, Long>{
     @Query("SELECT o FROM Order o " +
-            "WHERE (:id IS NULL OR o.id = :id) " +
+            "WHERE (:employeeID IS NULL OR o.employeeID LIKE %:employeeID%) " +
             "AND (:employeeName IS NULL OR o.employeeName LIKE %:employeeName%) " +
             "AND (:customerName IS NULL OR o.customerName LIKE %:customerName%) " +
-            "AND (:createdAt IS NULL OR o.createdAt >= :createdAt) " +
-            "AND (:updatedAt IS NULL OR o.updatedAt <= :updatedAt) " +
-            "AND (:price IS NULL OR o.price = :price) " +
+            "AND (:fromDate IS NULL OR o.createdAt >= :fromDate) " +
+            "AND (:toDate IS NULL OR o.createdAt <= :toDate) " +
+            "AND (:minPrice IS NULL OR o.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR o.price <= :maxPrice) " +
             "AND (:status IS NULL OR o.status LIKE %:status%)")
-    List<Order> searchOrders(@Param("id") Long id,
+    List<Order> searchOrders(@Param("employeeID") String employeeID,
                              @Param("employeeName") String employeeName,
                              @Param("customerName") String customerName,
-                             @Param("createdAt") LocalDateTime createdAt,
-                             @Param("updatedAt") LocalDateTime updatedAt,
-                             @Param("price") BigDecimal price,
+                             @Param("fromDate") LocalDate fromDate,
+                             @Param("toDate") LocalDate toDate,
+                             @Param("minPrice") BigDecimal minPrice,
+                             @Param("maxPrice") BigDecimal maxPrice,
                              @Param("status") String status,
                              Pageable pageable);
+
+    @Query("SELECT count(*) FROM Order o " +
+            "WHERE (:employeeID IS NULL OR o.employeeID LIKE %:employeeID%) " +
+            "AND (:employeeName IS NULL OR o.employeeName LIKE %:employeeName%) " +
+            "AND (:customerName IS NULL OR o.customerName LIKE %:customerName%) " +
+            "AND (:fromDate IS NULL OR o.createdAt >= :fromDate) " +
+            "AND (:toDate IS NULL OR o.createdAt <= :toDate) " +
+            "AND (:minPrice IS NULL OR o.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR o.price <= :maxPrice) " +
+            "AND (:status IS NULL OR o.status LIKE %:status%)")
+    long totalRecords(@Param("employeeID") String employeeID,
+                             @Param("employeeName") String employeeName,
+                             @Param("customerName") String customerName,
+                             @Param("fromDate") LocalDate fromDate,
+                             @Param("toDate") LocalDate toDate,
+                             @Param("minPrice") BigDecimal minPrice,
+                             @Param("maxPrice") BigDecimal maxPrice,
+                             @Param("status") String status);
     List<Order> findByEmployeeId(Long id);
     List<Order> findByCustomerId(Long id);
 

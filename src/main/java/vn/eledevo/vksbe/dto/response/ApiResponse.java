@@ -16,6 +16,7 @@ public class ApiResponse<T> {
     int code;
     String message;
     T result;
+    long totalRecords;
 
     public ApiResponse() {
         this.code = OK.value();
@@ -31,6 +32,13 @@ public class ApiResponse<T> {
         this.code = code;
         this.message = message;
         this.result = result;
+    }
+
+    public ApiResponse(int code, String message, T result, long totalRecords) {
+        this.code = code;
+        this.message = message;
+        this.result = result;
+        this.totalRecords = totalRecords;
     }
 
     public static <T> ApiResponse<T> ok(T body) {

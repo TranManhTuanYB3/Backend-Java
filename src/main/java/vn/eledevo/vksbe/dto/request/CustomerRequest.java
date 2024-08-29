@@ -2,6 +2,7 @@ package vn.eledevo.vksbe.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.eledevo.vksbe.entity.Employee;
 
 @Builder
 @Getter
@@ -14,5 +15,5 @@ public class CustomerRequest {
     String address;
     String phone;
     String status;
-    Long employee;
+    Employee employee;
 }

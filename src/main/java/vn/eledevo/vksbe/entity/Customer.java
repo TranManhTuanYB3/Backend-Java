@@ -1,6 +1,5 @@
 package vn.eledevo.vksbe.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

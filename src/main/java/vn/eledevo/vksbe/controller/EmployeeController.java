@@ -13,6 +13,7 @@ import vn.eledevo.vksbe.service.employee.EmployeeService;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/v1/employee")
 @RequiredArgsConstructor
 public class EmployeeController {
@@ -27,7 +28,7 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getEmployee(
             @RequestBody Employee textSearch,
             @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam(defaultValue = "") String sortDirection,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "0") int currentPage,
             @RequestParam(defaultValue = "3") int limitPage
     ){
@@ -35,7 +36,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Employee>> addEmployee(@RequestBody EmployeeRequest employeeRequest){
+    public ResponseEntity<ApiResponse<Employee>> addEmployee(@RequestBody EmployeeRequest employeeRequest) throws ValidationException {
         return ResponseEntity.ok(employeeService.addEmployee(employeeRequest));
     }
 
@@ -47,5 +48,15 @@ public class EmployeeController {
     @DeleteMapping("delete/{id}")
     public ResponseEntity<ApiResponse<Employee>> deleteCustomer(@PathVariable Long id) throws ValidationException {
         return ResponseEntity.ok(employeeService.deleteEmployee(id));
+    }
+
+    @GetMapping("/getnoid")
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getUnassignedEmployees() {
+        return ResponseEntity.ok(employeeService.getUnassignedEmployees());
+    }
+
+    @GetMapping("/getid")
+    public ResponseEntity<ApiResponse<List<EmployeeResponse>>> getUnassignedEmployees(@RequestParam Long id) {
+        return ResponseEntity.ok(employeeService.getUnassignedEmployeesExcluding(id));
     }
 }

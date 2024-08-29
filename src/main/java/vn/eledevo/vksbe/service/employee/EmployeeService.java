@@ -12,7 +12,10 @@ import java.util.List;
 public interface EmployeeService {
     ApiResponse<List<EmployeeResponse>> getAllEmployee();
     ApiResponse<List<EmployeeResponse>> getEmployee(Employee textSearch, String sortField, String sortDirection, int currentPage, int limitPage);
-    ApiResponse<Employee> addEmployee(EmployeeRequest employeeRequest);
+    ApiResponse<Employee> addEmployee(EmployeeRequest employeeRequest) throws ValidationException;
     ApiResponse<Employee> updateEmployee(Long id, EmployeeRequest employeeRequest) throws ValidationException;
     ApiResponse<Employee> deleteEmployee(Long id) throws ValidationException;
+
+    ApiResponse<List<EmployeeResponse>> getUnassignedEmployees();
+    ApiResponse<List<EmployeeResponse>> getUnassignedEmployeesExcluding(Long id);
 }

@@ -11,7 +11,6 @@ import vn.eledevo.vksbe.dto.request.CustomerRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.CustomerResponse;
 import vn.eledevo.vksbe.entity.Customer;
-import vn.eledevo.vksbe.entity.Employee;
 import vn.eledevo.vksbe.entity.Order;
 import vn.eledevo.vksbe.exception.ValidationException;
 import vn.eledevo.vksbe.mapper.CustomerMapper;
@@ -19,6 +18,7 @@ import vn.eledevo.vksbe.repository.CustomerRepository;
 import vn.eledevo.vksbe.repository.EmployeeRepository;
 import vn.eledevo.vksbe.repository.OrderRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,32 +55,61 @@ public class CustomerServiceImpl implements CustomerService{
         }
         Sort sort = Sort.by(direction, sortField);
         Pageable pageable = PageRequest.of(currentPage, limitPage, sort);
-        List<Customer> customerList = customerRepository.searchCustomers(
-                textSearch.getName(),
-                textSearch.getAddress(),
-                textSearch.getPhone(),
-                textSearch.getStatus(),
-                pageable
-        );
+        List<Customer> customerList;
+        long totalRecords;
+        if (textSearch.getEmployee()==null) {
+             customerList = customerRepository.searchCustomers(
+                    textSearch.getName(),
+                    textSearch.getAddress(),
+                    textSearch.getPhone(),
+                    textSearch.getStatus(),
+                    pageable
+            );
+            totalRecords = customerRepository.totalRecordsCustomer(
+                    textSearch.getName(),
+                    textSearch.getAddress(),
+                    textSearch.getPhone(),
+                    textSearch.getStatus()
+            );
+        } else {
+            customerList = customerRepository.searchEmployee(
+                    textSearch.getName(),
+                    textSearch.getAddress(),
+                    textSearch.getPhone(),
+                    textSearch.getStatus(),
+                    textSearch.getEmployee().getName(),
+                    pageable
+            );
+            totalRecords = customerRepository.totalRecordsEmployee(
+                    textSearch.getName(),
+                    textSearch.getAddress(),
+                    textSearch.getPhone(),
+                    textSearch.getStatus(),
+                    textSearch.getEmployee().getName()
+            );
+        }
         List<CustomerResponse> customerResponseList = customerList
                 .stream()
                 .map(customerMapper::mapEntityToResponse)
                 .collect(Collectors.toList());
-        return new ApiResponse<>(200, "Lấy dữ liệu thành công", customerResponseList);
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", customerResponseList, totalRecords);
     }
 
     @Override
     public ApiResponse<Customer> addCustomer(CustomerRequest customerRequest) throws ValidationException{
+        if (customerRepository.existsByPhone(customerRequest.getPhone())) {
+            throw new ValidationException("Phone", PHONE_EXIST);
+        }
+
         Customer customer = customerMapper.mapRequestToEntity(customerRequest);
         if (customerRequest.getEmployee() == null){
             customer.setEmployee(null);
-        } else if (customerRepository.existsByEmployeeId(customerRequest.getEmployee())){
+        } else if (customerRepository.existsByEmployeeId(customerRequest.getEmployee().getId())){
             throw new ValidationException("Employee", EMPLOYEE_EXIST);
-        } else if (!employeeRepository.existsById(customerRequest.getEmployee())){
+        } else if (!employeeRepository.existsById(customerRequest.getEmployee().getId())){
             throw new ValidationException("Employee", EMPLOYEE_NOT_EXIST);
         } else {
-            Employee employee = employeeRepository.findById(customerRequest.getEmployee()).get();
-            customer.setEmployee(employee);
+            customer.setEmployee(customerRequest.getEmployee());
         }
         return new ApiResponse<>(200, "Thêm dữ liệu thành công", customerRepository.save(customer));
     }
@@ -90,16 +119,20 @@ public class CustomerServiceImpl implements CustomerService{
         if (!customerRepository.existsById(id)){
             throw new ValidationException("Customer", CUSTOMER_NOT_EXIST);
         }
+
+        if (customerRepository.existsByPhoneAndIdNot(customerRequest.getPhone(), id)) {
+            throw new ValidationException("Phone", PHONE_EXIST);
+        }
+
         Customer customer = customerRepository.findById(id).get();
         if (customerRequest.getEmployee() == null){
             customer.setEmployee(null);
-        } else if (customerRepository.existsByEmployeeId(customerRequest.getEmployee())){
+        } else if (customerRepository.existsByEmployeeIdAndIdNot(customerRequest.getEmployee().getId(), id)){
             throw new ValidationException("Employee", EMPLOYEE_EXIST);
-        } else if (!employeeRepository.existsById(customerRequest.getEmployee())){
+        } else if (!employeeRepository.existsById(customerRequest.getEmployee().getId())){
             throw new ValidationException("Employee", EMPLOYEE_NOT_EXIST);
         } else {
-            Employee employee = employeeRepository.findById(customerRequest.getEmployee()).get();
-            customer.setEmployee(employee);
+            customer.setEmployee(customerRequest.getEmployee());
         }
         customer.setName(customerRequest.getName());
         customer.setAddress(customerRequest.getAddress());

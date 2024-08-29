@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vn.eledevo.vksbe.dto.request.OrderRequest;
+import vn.eledevo.vksbe.dto.request.OrderTextSearchRequest;
 import vn.eledevo.vksbe.dto.response.ApiResponse;
 import vn.eledevo.vksbe.dto.response.OrderResponse;
 import vn.eledevo.vksbe.entity.Customer;
@@ -47,7 +48,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public ApiResponse<List<OrderResponse>> getOrder(Order textSearch, String sortField, String sortDirection, int currentPage, int limitPage) {
+    public ApiResponse<List<OrderResponse>> getOrder(OrderTextSearchRequest textSearch, String sortField, String sortDirection, int currentPage, int limitPage) {
         Sort.Direction direction = Sort.Direction.ASC;
         if (sortDirection.equalsIgnoreCase("desc")) {
             direction = Sort.Direction.DESC;
@@ -55,12 +56,13 @@ public class OrderServiceImpl implements OrderService{
         Sort sort = Sort.by(direction, sortField);
         Pageable pageable = PageRequest.of(currentPage, limitPage, sort);
         List<Order> orderList = orderRepository.searchOrders(
-                textSearch.getId(),
+                textSearch.getEmployeeID(),
                 textSearch.getEmployeeName(),
                 textSearch.getCustomerName(),
-                textSearch.getCreatedAt(),
-                textSearch.getUpdatedAt(),
-                textSearch.getPrice(),
+                textSearch.getFromDate(),
+                textSearch.getToDate(),
+                textSearch.getMinPrice(),
+                textSearch.getMaxPrice(),
                 textSearch.getStatus(),
                 pageable
         );
@@ -68,7 +70,17 @@ public class OrderServiceImpl implements OrderService{
                 .stream()
                 .map(orderMapper::mapEntityToResponse)
                 .collect(Collectors.toList());
-        return new ApiResponse<>(200, "Lấy dữ liệu thành công", orderResponseList);
+        long totalRecords = orderRepository.totalRecords(
+                textSearch.getEmployeeID(),
+                textSearch.getEmployeeName(),
+                textSearch.getCustomerName(),
+                textSearch.getFromDate(),
+                textSearch.getToDate(),
+                textSearch.getMinPrice(),
+                textSearch.getMaxPrice(),
+                textSearch.getStatus()
+        );
+        return new ApiResponse<>(200, "Lấy dữ liệu thành công", orderResponseList, totalRecords);
     }
 
 
@@ -77,15 +89,15 @@ public class OrderServiceImpl implements OrderService{
         Order order = orderMapper.mapRequestToEntity(orderRequest);
         if (orderRequest.getEmployee() == null || orderRequest.getCustomer() == null){
             throw new ValidationException("Order", ORDER_BLANK);
-        } else if (!employeeRepository.existsById(orderRequest.getEmployee())){
+        } else if (!employeeRepository.existsById(orderRequest.getEmployee().getId())){
             throw new ValidationException("Employee", EMPLOYEE_NOT_EXIST);
-        } else if (!customerRepository.existsById(orderRequest.getCustomer())){
+        } else if (!customerRepository.existsById(orderRequest.getCustomer().getId())){
             throw new ValidationException("Customer", CUSTOMER_NOT_EXIST);
         }
-        Employee employee = employeeRepository.findById(orderRequest.getEmployee()).get();
-        Customer customer = customerRepository.findById(orderRequest.getCustomer()).get();
-        order.setEmployee(employee);
-        order.setCustomer(customer);
+        Employee employee = employeeRepository.findById(orderRequest.getEmployee().getId()).get();
+        Customer customer = customerRepository.findById(orderRequest.getCustomer().getId()).get();
+        order.setEmployee(orderRequest.getEmployee());
+        order.setCustomer(orderRequest.getCustomer());
         order.setEmployeeID(employee.getEmployeeID());
         order.setEmployeeName(employee.getName());
         order.setCustomerName(customer.getName());
